@@ -105,18 +105,19 @@
             z-index: 5;
         }
 
-        /* DASHBOARD FLOTANTE / RESPONSIVO */
+        /* DASHBOARD FLOTANTE / UBICADO A LA IZQUIERDA */
         #dashboard { 
             position: absolute;
             top: 10px;
-            right: 10px;
+            left: 10px; /* Movido a la izquierda para liberar la escala de precio derecha */
+            right: auto;
             z-index: 10;
             display: flex; 
             flex-direction: column; 
-            gap: 8px; 
+            gap: 6px; 
             max-height: calc(100% - 20px);
             overflow-y: auto;
-            width: 310px;
+            width: 270px; /* Reducido de 310px a 270px para ocupar menos espacio visual */
             padding-right: 2px;
         }
 
@@ -124,10 +125,10 @@
         #dashboard::-webkit-scrollbar-thumb { background: #2a2e39; border-radius: 2px; }
 
         .vsa-table-container {
-            background-color: rgba(19, 23, 34, 0.95);
+            background-color: rgba(19, 23, 34, 0.92);
             border: 1px solid #2962ff;
             border-radius: 4px;
-            padding: 6px;
+            padding: 5px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.6);
         }
 
@@ -166,10 +167,10 @@
         .txt-purple { color: #e040fb; font-weight: bold; }
 
         .predict-card {
-            background: linear-gradient(135deg, rgba(20,26,40,0.95), rgba(10,13,20,0.95));
+            background: linear-gradient(135deg, rgba(20,26,40,0.92), rgba(10,13,20,0.92));
             border: 1px solid #00e5ff;
             border-radius: 6px;
-            padding: 8px;
+            padding: 6px;
             font-size: 11px;
             box-shadow: 0 4px 15px rgba(0, 229, 255, 0.15);
         }
@@ -206,10 +207,10 @@
         .predict-val { font-size: 10px; font-weight: bold; }
 
         .decision-card {
-            background: rgba(19, 23, 34, 0.95);
+            background: rgba(19, 23, 34, 0.92);
             border: 1px solid #2962ff;
             border-radius: 6px;
-            padding: 8px;
+            padding: 6px;
             font-size: 10px;
         }
 
@@ -217,8 +218,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 3px 5px;
-            margin-top: 4px;
+            padding: 2px 4px;
+            margin-top: 3px;
             border-radius: 4px;
             background: rgba(255, 255, 255, 0.02);
             border-left: 3px solid #787b86;
@@ -232,10 +233,10 @@
         .range-desc { color: #b2b5be; font-size: 9px; text-align: right; }
 
         .setup-card {
-            background: rgba(19, 23, 34, 0.95);
+            background: rgba(19, 23, 34, 0.92);
             border: 1px solid #ffd700;
             border-radius: 6px;
-            padding: 8px;
+            padding: 6px;
             font-size: 10px;
             box-shadow: 0 4px 15px rgba(255, 215, 0, 0.1);
         }
@@ -252,9 +253,9 @@
         .setup-value { font-weight: bold; font-size: 10px; }
 
         .config-box {
-            background-color: rgba(19, 23, 34, 0.95);
+            background-color: rgba(19, 23, 34, 0.92);
             border: 1px solid #2a2e39;
-            padding: 6px 8px;
+            padding: 5px 6px;
             border-radius: 4px;
             font-size: 10px;
             display: flex;
@@ -619,7 +620,7 @@
             height: chartContainer.clientHeight,
             layout: { background: { type: 'solid', color: '#000000' }, textColor: '#d1d4dc' },
             grid: { vertLines: { color: '#161923' }, horzLines: { color: '#161923' } },
-            timeScale: { borderColor: '#2a2e39', timeVisible: true, secondsVisible: false, rightOffset: 12 },
+            timeScale: { borderColor: '#2a2e39', timeVisible: true, secondsVisible: false, rightOffset: 15 },
             rightPriceScale: { borderColor: '#2a2e39', autoScale: true }
         });
 
