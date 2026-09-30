@@ -281,8 +281,8 @@
         <div class="controls-left">
             <span>TF:</span>
             <select id="timeframe" class="select-tf">
-                <option value="5m">5M</option>
-                <option value="15m" selected>15M</option>
+                <option value="5m" selected>5M</option>
+                <option value="15m">15M</option>
                 <option value="1h">1H</option>
                 <option value="4h">4H</option>
                 <option value="1d">1D</option>
@@ -440,7 +440,7 @@
         const TELEGRAM_CONFIG = { enabled: true, username: "ERC1670" };
 
         let showSupertrend = true;
-        let useFilter = true; // ESTADO DEL FILTRO (ON/OFF)
+        let useFilter = true;
         let showVsaLines = true;
         let showVsaSignals = true;
         let showVPVR = true;
@@ -462,7 +462,7 @@
         let ws = null;
         let pingInterval = null;
         let reconnectTimeout = null;
-        let currentTF = "15m";
+        let currentTF = "5m";
 
         const statusEl = document.getElementById("status");
         const timeframeSelect = document.getElementById("timeframe");
@@ -532,20 +532,9 @@
                 .catch(err => console.error("Error Telegram:", err));
         }
 
-        function evaluateSupertrendAlert(lastSignal, timeframe) {
-            if (!lastSignal || !lastSignal.time) return;
-            if (lastSignal.time !== lastNotifiedSignalTime || lastSignal.type !== lastNotifiedSignalType) {
-                lastNotifiedSignalTime = lastSignal.time;
-                lastNotifiedSignalType = lastSignal.type;
-                
-                playBeepSound(lastSignal.type);
-                sendTelegramAlert(lastSignal.type, lastSignal.price, timeframe);
-            }
-        }
-
-        /* MOTOR DE SUPERTREND CON FILTRO OPCIONAL */
+        /* MOTOR DE SUPERTREND SIN REPINTADO (SOLO VELAS CERRADAS) */
         function getSupertrendMarkers(candles, atrPeriods = 14, multiplier = 2.0) {
-            if (!candles || candles.length < atrPeriods + 1) return { stMarkers: [], lastSignal: null };
+            if (!candles || candles.length < atrPeriods + 2) return { stMarkers: [], lastSignal: null };
             const len = candles.length;
             const tr = new Float64Array(len);
             tr[0] = candles[0].high - candles[0].low;
@@ -586,12 +575,12 @@
             const stMarkers = [];
             let lastSignal = null;
 
-            // Extraer Sesgo MTF de 1H
             const h1Data = mtfVsaCache['1h'];
             const is1HBear = h1Data && h1Data.lastState && h1Data.lastState.isSell;
             const is1HBull = h1Data && h1Data.lastState && h1Data.lastState.isBuy;
 
-            for (let i = 1; i < len; i++) {
+            // Evaluamos ÚNICAMENTE hasta len - 1 (velas completamente cerradas)
+            for (let i = 1; i < len - 1; i++) {
                 const closePx = candles[i].close;
 
                 let blockedByResistance = false;
@@ -615,7 +604,6 @@
                     }
                 }
 
-                // Generación de Marcadores según si el filtro está encendido o apagado
                 if (trend[i] === 1 && trend[i - 1] === -1) {
                     if (!useFilter || (!blockedByResistance && !is1HBear)) {
                         stMarkers.push({ time: candles[i].time, position: 'belowBar', color: '#00e676', shape: 'arrowUp', text: 'ST BUY' });
@@ -923,6 +911,13 @@
                 dashStSignal.innerText = lastSignal.type;
                 dashStSignal.className = lastSignal.type === 'BUY' ? 'txt-green' : 'txt-red';
                 dashStPrice.innerText = `$${lastSignal.price.toFixed(2)}`;
+
+                if (lastSignal.time !== lastNotifiedSignalTime || lastSignal.type !== lastNotifiedSignalType) {
+                    lastNotifiedSignalTime = lastSignal.time;
+                    lastNotifiedSignalType = lastSignal.type;
+                    playBeepSound(lastSignal.type);
+                    sendTelegramAlert(lastSignal.type, lastSignal.price, currentTF);
+                }
             } else {
                 dashStSignal.innerText = "SIN SEÑAL";
                 dashStSignal.className = "txt-yellow";
@@ -1052,7 +1047,6 @@
             refreshSupertrendDisplay();
         });
 
-        // MANEJADOR PARA ACTIVAR / DESACTIVAR EL FILTRO DE SUPERTREND
         btnFilter.addEventListener("click", () => {
             useFilter = !useFilter;
             if (useFilter) {
